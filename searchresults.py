@@ -1,11 +1,16 @@
 from selectorlib import Extractor
 import requests
-import json
 from time import sleep
 
 
 # Create an Extractor by reading from the YAML file
-e = Extractor.from_yaml_file('search_results.yml')
+e = Extractor.from_yaml_file('flipkart1.yml')
+
+# url = 'https://www.amazon.in/s?k=lenovo&i=computers&rh=n%3A1375424031%2Cp_89%3ALenovo&dc&qid=1599827986&rnid=3837712031&ref=sr_nr_p_89_1'
+url = 'https://www.flipkart.com/search?q=macbook+pro&sid=6bo%2Cb5g&as=on&as-show=on&otracker=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&otracker1=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&as-pos=1&as-type=HISTORY&suggestionId=macbook+pro%7CLaptops&requestId=4b1460e8-fcf5-4369-a655-a2501be025a8&as-backfill=on'
+text = 'lenovo'
+ram = '8GB'
+storage = '1TB'
 
 
 def scrape(url):
@@ -37,27 +42,30 @@ def scrape(url):
     # Pass the HTML of the page and create
     return e.extract(r.text)
 
-# product_data = []
 
-# url = 'https://www.amazon.in/s?k=lenovo&i=computers&rh=n%3A1375424031%2Cp_89%3ALenovo&dc&qid=1599827986&rnid=3837712031&ref=sr_nr_p_89_1'
-url = 'https://www.amazon.in/s?k=dell&rh=n%3A1375424031&ref=nb_sb_noss'
-text = 'lenovo'
-ram = '8GB'
-storage = '1TB'
-
-# with open('search_results_output.jsonl', 'w') as outfile:
-data = scrape(url)
 filtered_products = []
-# print(data)
-if data:
+product_data = []
+
+
+def filters(data):
+    if data:
+        for product in data.values():
+            for item in product:
+                print(f"Saving Product: {item['title']}")
+                if ram in ''.join(item['title'].split()) and storage in ''.join(item['title'].split()):
+                    filtered_products.append(item)
+
+
+def main():
+    data = scrape(url)
+    # filters(data)
     for product in data.values():
-        # product['search_url'] = url
         for item in product:
-            print(f"Saving Product: {item['title']}")
-            if ram in ''.join(item['title'].split()) and storage in ''.join(item['title'].split()):
-                filtered_products.append(item)
-        # # json.dump(product, outfile)
-        # # outfile.write("\n")
+            product_data.append(item)
+    first_five_products = product_data[:5]
+    # print(first_five_products)
+    print(data)
 
 
-print(filtered_products)
+main()
+
