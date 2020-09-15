@@ -1,0 +1,34 @@
+products:
+    css: 'div._1UoZlX'
+    xpath: null
+    multiple: true
+    type: Text
+    children:
+        title:
+            css: 'div._3wU53n'
+            xpath: null
+            type: Text
+        image:
+            css: 'img._1Nyybr'
+            xpath: null
+            type: Image
+        url:
+            css: 'a._31qSD5'
+            xpath: null
+            type: Link
+        specs:
+            css: 'ul.vFw0gD'
+            xpath: null
+            type: Text
+        rating:
+            css: 'div.hGSR34'
+            xpath: null
+            type: Text
+        reviews:
+            css: 'span:nth-of-type(3)'
+            xpath: null
+            type: Text
+        price:
+            css: 'div._1vC4OE'
+            xpath: null
+            type: Text
