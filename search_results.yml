@@ -9,7 +9,7 @@ products:
             xpath: null
             type: Text
         image:
-            css: 'div img.s-image'
+            css: 'div img[src]'
             xpath: null
             type: Image
         url:
