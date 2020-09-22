@@ -1,9 +1,8 @@
 from selectorlib import Extractor
+from requests_html import HTMLSession
 import requests
 from time import sleep
 
-
-# Create an Extractor by reading from the YAML file
 e = Extractor.from_yaml_file('flipkart1.yml')
 
 # url = 'https://www.amazon.in/s?k=lenovo&i=computers&rh=n%3A1375424031%2Cp_89%3ALenovo&dc&qid=1599827986&rnid=3837712031&ref=sr_nr_p_89_1'
@@ -24,27 +23,25 @@ def scrape(url):
         'sec-fetch-mode': 'navigate',
         'sec-fetch-user': '?1',
         'sec-fetch-dest': 'document',
-        'referer': 'https://www.amazon.in/',
+        'referer': 'https://www.flipkart.com/',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
 
-    # Download the page using requests
     print(f"Downloading {url}")
     r = requests.get(url, headers=headers)
     sleep(2)
-    # Simple check to check if page was blocked (Usually 503)
     if r.status_code > 500:
         if "To discuss automated access to Amazon data please contact" in r.text:
             print("Page %s was blocked by Amazon. Please try using better proxies\n"%url)
         else:
             print("Page %s must have been blocked by Amazon as the status code was %d"%(url,r.status_code))
         return None
-    # Pass the HTML of the page and create
     return e.extract(r.text)
 
 
 filtered_products = []
 product_data = []
+image_data = []
 
 
 def filters(data):
@@ -56,6 +53,18 @@ def filters(data):
                     filtered_products.append(item)
 
 
+def images():
+    session = HTMLSession()
+    response = session.get(url)
+    response.html.render(sleep=1, scrolldown=20)
+    # Container for each product being displayed
+    div = response.html.find('._1UoZlX')
+    for image in div:
+        img = image.find('img', first=True)
+        img_src = img.attrs['src']
+        image_data.append(img_src)
+
+
 def main():
     data = scrape(url)
     # filters(data)
@@ -65,6 +74,11 @@ def main():
     first_five_products = product_data[:5]
     # print(first_five_products)
     print(data)
+    images()
+    for i in image_data:
+        print(i)
+    # for i in image_data:
+    #     print(i)
 
 
 main()
