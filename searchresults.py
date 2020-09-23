@@ -3,11 +3,10 @@ import requests
 from time import sleep
 
 
-# Create an Extractor by reading from the YAML file
-e = Extractor.from_yaml_file('flipkart1.yml')
+e = Extractor.from_yaml_file('search_results.yml')
 
 # url = 'https://www.amazon.in/s?k=lenovo&i=computers&rh=n%3A1375424031%2Cp_89%3ALenovo&dc&qid=1599827986&rnid=3837712031&ref=sr_nr_p_89_1'
-url = 'https://www.flipkart.com/search?q=macbook+pro&sid=6bo%2Cb5g&as=on&as-show=on&otracker=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&otracker1=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&as-pos=1&as-type=HISTORY&suggestionId=macbook+pro%7CLaptops&requestId=4b1460e8-fcf5-4369-a655-a2501be025a8&as-backfill=on'
+url = 'https://www.amazon.in/s?k=dell&rh=n%3A1375424031&ref=nb_sb_noss'
 text = 'lenovo'
 ram = '8GB'
 storage = '1TB'
@@ -28,23 +27,21 @@ def scrape(url):
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
 
-    # Download the page using requests
     print(f"Downloading {url}")
     r = requests.get(url, headers=headers)
     sleep(2)
-    # Simple check to check if page was blocked (Usually 503)
     if r.status_code > 500:
         if "To discuss automated access to Amazon data please contact" in r.text:
             print("Page %s was blocked by Amazon. Please try using better proxies\n"%url)
         else:
             print("Page %s must have been blocked by Amazon as the status code was %d"%(url,r.status_code))
         return None
-    # Pass the HTML of the page and create
     return e.extract(r.text)
 
 
 filtered_products = []
 product_data = []
+url_data = []
 
 
 def filters(data):
@@ -56,6 +53,14 @@ def filters(data):
                     filtered_products.append(item)
 
 
+def fix_url(data):
+    if data:
+        for product in data.values():
+            for item in product:
+                new_url = 'https://www.amazon.in' + item['url']
+                url_data.append(new_url)
+
+
 def main():
     data = scrape(url)
     # filters(data)
@@ -63,8 +68,15 @@ def main():
         for item in product:
             product_data.append(item)
     first_five_products = product_data[:5]
-    # print(first_five_products)
-    print(data)
+    print(first_five_products)
+
+    fix_url(data)
+    for u in url_data:
+        print(u)
+
+    # for value in first_five_products:
+    #     print(value['title'])
+    #     print(value['price'])
 
 
 main()
