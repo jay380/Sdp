@@ -1,12 +1,12 @@
 from selectorlib import Extractor
-from requests_html import HTMLSession
 import requests
 from time import sleep
 
-e = Extractor.from_yaml_file('flipkart1.yml')
+
+e = Extractor.from_yaml_file('search_results.yml')
 
 # url = 'https://www.amazon.in/s?k=lenovo&i=computers&rh=n%3A1375424031%2Cp_89%3ALenovo&dc&qid=1599827986&rnid=3837712031&ref=sr_nr_p_89_1'
-url = 'https://www.flipkart.com/search?q=macbook+pro&sid=6bo%2Cb5g&as=on&as-show=on&otracker=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&otracker1=AS_QueryStore_HistoryAutoSuggest_1_7_na_na_na&as-pos=1&as-type=HISTORY&suggestionId=macbook+pro%7CLaptops&requestId=4b1460e8-fcf5-4369-a655-a2501be025a8&as-backfill=on'
+url = 'https://www.amazon.in/s?k=dell&rh=n%3A1375424031&ref=nb_sb_noss'
 text = 'lenovo'
 ram = '8GB'
 storage = '1TB'
@@ -23,7 +23,7 @@ def scrape(url):
         'sec-fetch-mode': 'navigate',
         'sec-fetch-user': '?1',
         'sec-fetch-dest': 'document',
-        'referer': 'https://www.flipkart.com/',
+        'referer': 'https://www.amazon.in/',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
 
@@ -41,7 +41,7 @@ def scrape(url):
 
 filtered_products = []
 product_data = []
-image_data = []
+url_data = []
 
 
 def filters(data):
@@ -53,16 +53,12 @@ def filters(data):
                     filtered_products.append(item)
 
 
-def images():
-    session = HTMLSession()
-    response = session.get(url)
-    response.html.render(sleep=1, scrolldown=20)
-    # Container for each product being displayed
-    div = response.html.find('._1UoZlX')
-    for image in div:
-        img = image.find('img', first=True)
-        img_src = img.attrs['src']
-        image_data.append(img_src)
+def fix_url(data):
+    if data:
+        for product in data.values():
+            for item in product:
+                new_url = 'https://www.amazon.in' + item['url']
+                url_data.append(new_url)
 
 
 def main():
@@ -72,13 +68,15 @@ def main():
         for item in product:
             product_data.append(item)
     first_five_products = product_data[:5]
-    # print(first_five_products)
-    print(data)
-    images()
-    for i in image_data:
-        print(i)
-    # for i in image_data:
-    #     print(i)
+    print(first_five_products)
+
+    fix_url(data)
+    for u in url_data:
+        print(u)
+
+    # for value in first_five_products:
+    #     print(value['title'])
+    #     print(value['price'])
 
 
 main()
