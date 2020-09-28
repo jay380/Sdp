@@ -57,8 +57,8 @@ def fix_url(data):
     if data:
         for product in data.values():
             for item in product:
-                new_url = 'https://www.amazon.in' + item['url']
-                url_data.append(new_url)
+                item['url'] = 'https://www.amazon.in' + item['url']
+    return data
 
 
 def main():
@@ -68,11 +68,11 @@ def main():
         for item in product:
             product_data.append(item)
     first_five_products = product_data[:5]
-    print(first_five_products)
+    # print(first_five_products)
 
-    fix_url(data)
-    for u in url_data:
-        print(u)
+    new_data = fix_url(data)
+    print(new_data)
+
 
     # for value in first_five_products:
     #     print(value['title'])
