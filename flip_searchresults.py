@@ -42,7 +42,6 @@ def scrape(url):
 filtered_products = []
 product_data = []
 image_data = []
-url_data = []
 
 
 def filters(data):
@@ -54,15 +53,16 @@ def filters(data):
                     filtered_products.append(item)
 
 
-def fix_url(data):
-    if data:
-        for product in data.values():
-            for item in product:
-                new_url = 'https://www.flipkart.com' + item['url']
-                url_data.append(new_url)
+# def fix_url(data):
+#     if data:
+#         for product in data.values():
+#             for item in product:
+#                 item['url'] = 'https://www.flipkart.com' + item['url']
+#     return data
 
 
-def images():
+def add_images_urls(data):
+    i = 0
     session = HTMLSession()
     response = session.get(url)
     response.html.render(sleep=1, scrolldown=20)
@@ -73,6 +73,14 @@ def images():
         img_src = img.attrs['src']
         image_data.append(img_src)
 
+    for product in data.values():
+        for item in product:
+            item['url'] = 'https://www.flipkart.com' + item['url']
+            if i < len(image_data):
+                item['image'] = image_data[i]
+                i += 1
+    return data
+
 
 def main():
     data = scrape(url)
@@ -82,15 +90,15 @@ def main():
             product_data.append(item)
     first_five_products = product_data[:5]
     # print(first_five_products)
-    print(data)
+    # print(data)
 
-    images()
-    for i in image_data:
-        print(i)
+    # images()
+    # print('Images: ')
+    # for i in image_data:
+    #     print(i)
 
-    fix_url(data)
-    for u in url_data:
-        print(u)
+    new_data = add_images_urls(data)
+    print(new_data)
 
 
 main()
